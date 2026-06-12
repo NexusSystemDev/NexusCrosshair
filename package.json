@@ -90,8 +90,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "NexusTools",
-        "repo": "nexus-crosshair-pro"
+        "owner": "NexusSystemDev",
+        "repo": "NexusCrosshair"
       },
       {
         "provider": "generic",

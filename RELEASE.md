@@ -3,7 +3,7 @@
 ## GitHub Releases
 
 1. Create a public GitHub repository:
-   `NexusTools/nexus-crosshair-pro`
+   `NexusSystemDev/NexusCrosshair`
 
 2. Push this project to the repository.
 
