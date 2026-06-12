@@ -236,7 +236,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-black tracking-wide">Nexus Crosshair Pro</h1>
-            <p className="text-xs font-medium text-zinc-400">Version 0.0.0 / Stable</p>
+            <p className="text-xs font-medium text-zinc-400">Version 0.0.1 / Stable</p>
           </div>
         </div>
 
