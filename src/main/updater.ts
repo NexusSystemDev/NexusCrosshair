@@ -8,12 +8,22 @@ let lastStatus: UpdaterStatus = {
   detail: 'Updater is ready. Configure a release feed before checking online.'
 };
 
+const releaseFeed = {
+  provider: 'github' as const,
+  owner: 'NexusSystemDev',
+  repo: 'NexusCrosshair'
+};
+
 const updatesEnabled = () => getSettings().onlineUpdatesEnabled;
+
+const configureFeed = () => {
+  autoUpdater.setFeedURL(releaseFeed);
+};
 
 const friendlyUpdateError = (error: unknown) => {
   const message = error instanceof Error ? error.message : 'Update check failed.';
   if (message.includes('404') || message.includes('releases.atom')) {
-    return 'No public GitHub release feed is available yet. Publish the repository/releases or enable your own update server before checking online.';
+    return `GitHub release feed was not reachable for ${releaseFeed.owner}/${releaseFeed.repo}. Details: ${message}`;
   }
   if (message.includes('ENOTFOUND') || message.includes('updates.nexustools.local')) {
     return 'The configured update server is not reachable yet. Upload release files or configure a real update URL.';
@@ -43,6 +53,7 @@ autoUpdater.on('update-downloaded', (info) => {
 export function prepareAutoUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
+  configureFeed();
 }
 
 export async function downloadUpdateNow(): Promise<UpdaterStatus> {
@@ -53,6 +64,7 @@ export async function downloadUpdateNow(): Promise<UpdaterStatus> {
     return { status: 'current', detail: 'Update downloads are disabled until a release feed is configured.' };
   }
   try {
+    configureFeed();
     lastStatus = { ...lastStatus, status: 'downloading', detail: 'Starting update download...', percent: 0 };
     await autoUpdater.downloadUpdate();
     return lastStatus;
@@ -96,6 +108,7 @@ export async function checkForUpdatesNow(): Promise<UpdaterStatus> {
   }
 
   try {
+    configureFeed();
     const channel = getSettings().updateChannel;
     autoUpdater.channel = channel;
     lastStatus = { status: 'checking', detail: `Checking ${channel} channel...`, channel };
