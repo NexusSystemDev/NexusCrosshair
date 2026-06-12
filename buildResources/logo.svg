@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nexus Crosshair Pro logo">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#1f153d"/>
+      <stop offset="0.55" stop-color="#0c0a14"/>
+      <stop offset="1" stop-color="#07070a"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="58" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="76" fill="none" stroke="#8b5cf6" stroke-width="8" opacity=".95" filter="url(#glow)"/>
+  <path d="M128 18v58M128 180v58M18 128h58M180 128h58" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M100 166V90l56 76V90" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="5" fill="#fff"/>
+</svg>

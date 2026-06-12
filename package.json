@@ -1,0 +1,102 @@
+{
+  "name": "nexus-crosshair-pro",
+  "version": "0.0.0",
+  "description": "Click-through crosshair overlay for Windows.",
+  "author": "NexusTools",
+  "main": "app-dist/main/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"tsc -p tsconfig.main.json --watch\" \"wait-on app-dist/main/main.js http://localhost:5173 && electron .\"",
+    "build": "tsc -p tsconfig.main.json && vite build",
+    "dist": "npm run build && set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis portable",
+    "release:github": "npm run build && set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis portable --publish always",
+    "release:generic": "npm run dist",
+    "package": "npm run dist"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9",
+    "framer-motion": "^12.40.0",
+    "lucide-react": "^1.17.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "productName": "Nexus Crosshair Pro",
+    "appId": "com.nexustools.crosshairpro",
+    "copyright": "Copyright © 2026 NexusTools",
+    "directories": {
+      "output": "dist",
+      "buildResources": "buildResources"
+    },
+    "files": [
+      "app-dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "buildResources/icon.ico",
+        "to": "buildResources/icon.ico"
+      },
+      {
+        "from": "buildResources/brand-logo.png",
+        "to": "buildResources/brand-logo.png"
+      }
+    ],
+    "extraMetadata": {
+      "version": "0.0.0"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "buildResources/icon.ico",
+      "artifactName": "${productName} ${version} ${arch}.${ext}",
+      "signtoolOptions": {
+        "publisherName": "NexusTools"
+      }
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Nexus Crosshair Pro",
+      "artifactName": "Nexus Crosshair Pro Setup.exe",
+      "installerSidebar": "buildResources/installerSidebar.bmp",
+      "uninstallerSidebar": "buildResources/installerSidebar.bmp",
+      "installerHeader": "buildResources/installerHeader.bmp",
+      "include": "buildResources/installer.nsh"
+    },
+    "portable": {
+      "artifactName": "Nexus Crosshair Pro Portable.exe"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "NexusTools",
+        "repo": "nexus-crosshair-pro"
+      },
+      {
+        "provider": "generic",
+        "url": "https://updates.nexustools.local/nexus-crosshair-pro/"
+      }
+    ]
+  }
+}
