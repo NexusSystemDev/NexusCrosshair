@@ -60,6 +60,7 @@ export type AppSettings = {
   manualGameOverride: string;
   updateChannel: 'stable' | 'beta';
   onlineUpdatesEnabled: boolean;
+  autoCheckUpdates: boolean;
   overlayLockMode: boolean;
   streamerMode: boolean;
   streamerCleanMode: boolean;
@@ -144,6 +145,7 @@ export type NexusAPI = {
   checkForUpdates: () => Promise<UpdaterStatus>;
   downloadUpdate: () => Promise<UpdaterStatus>;
   installUpdate: () => Promise<UpdaterStatus>;
+  getUpdateStatus: () => Promise<UpdaterStatus>;
   openDataFolder: () => Promise<string>;
   exportStreamerSource: () => Promise<string | null>;
   onStateChanged: (callback: (state: AppState) => void) => () => void;

@@ -41,6 +41,7 @@ const defaultSettings: AppSettings = {
   manualGameOverride: '',
   updateChannel: 'stable',
   onlineUpdatesEnabled: false,
+  autoCheckUpdates: false,
   overlayLockMode: true,
   streamerMode: false,
   streamerCleanMode: false,

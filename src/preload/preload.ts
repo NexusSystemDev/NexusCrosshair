@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('nexusAPI', {
   checkForUpdates: () => ipcRenderer.invoke('updater:check'),
   downloadUpdate: () => ipcRenderer.invoke('updater:download'),
   installUpdate: () => ipcRenderer.invoke('updater:install'),
+  getUpdateStatus: () => ipcRenderer.invoke('updater:status'),
   openDataFolder: () => ipcRenderer.invoke('app:openDataFolder'),
   exportStreamerSource: () => ipcRenderer.invoke('streamer:exportSource'),
   onStateChanged: (callback: (state: AppState) => void) => {

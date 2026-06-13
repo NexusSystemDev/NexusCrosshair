@@ -5,7 +5,7 @@ import type { AppSettings, CrosshairSettings, Hotkeys, Profile } from '../render
 import { detectActiveGame, detectGames } from './gameDetector';
 import { registerHotkeys } from './hotkeys';
 import { createOverlayWindow, getOverlayBounds, refreshOverlayBounds, setOverlayVisible as showOverlay, updateOverlayCrosshair } from './overlay';
-import { checkForUpdatesNow, downloadUpdateNow, installUpdateNow, prepareAutoUpdater } from './updater';
+import { checkForUpdatesNow, downloadUpdateNow, getLastUpdateStatus, installUpdateNow, prepareAutoUpdater } from './updater';
 import {
   backupData,
   deleteProfile,
@@ -101,9 +101,11 @@ function rebuildTray() {
   if (!tray) return;
   const state = getState();
   const active = state.profiles.find((profile) => profile.id === state.activeProfileId);
+  const updateStatus = getLastUpdateStatus();
   tray.setToolTip(`Nexus Crosshair Pro${active ? ` - ${active.name}` : ''}`);
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: 'Nexus Crosshair Pro', enabled: false },
+    { label: `Version ${app.getVersion()}${updateStatus.status === 'available' ? ` - Update ${updateStatus.version}` : ''}`, enabled: false },
     { type: 'separator' },
     {
       label: state.overlayVisible ? 'Overlay ausschalten' : 'Overlay einschalten',
@@ -116,8 +118,22 @@ function rebuildTray() {
       }
     },
     {
-      label: 'Hauptfenster öffnen',
+      label: 'Hauptfenster ?ffnen',
       click: () => mainWindow?.show()
+    },
+    {
+      label: updateStatus.status === 'available' ? `Update ${updateStatus.version} herunterladen` : 'Nach Updates suchen',
+      enabled: state.settings.onlineUpdatesEnabled,
+      click: async () => {
+        if (getLastUpdateStatus().status === 'available') await downloadUpdateNow();
+        else await checkForUpdatesNow();
+        rebuildTray();
+      }
+    },
+    {
+      label: 'Update installieren & neu starten',
+      enabled: updateStatus.status === 'downloaded',
+      click: () => installUpdateNow()
     },
     {
       label: 'Profil wechseln',
@@ -356,6 +372,7 @@ function wireIpc() {
   ipcMain.handle('updater:check', () => checkForUpdatesNow());
   ipcMain.handle('updater:download', () => downloadUpdateNow());
   ipcMain.handle('updater:install', () => installUpdateNow());
+  ipcMain.handle('updater:status', () => getLastUpdateStatus());
   ipcMain.handle('app:openDataFolder', () => shell.openPath(app.getPath('userData')));
   ipcMain.handle('streamer:exportSource', () => exportStreamerSource());
   ipcMain.handle('game:refresh', async () => {
@@ -422,6 +439,9 @@ app.whenReady().then(async () => {
   showOverlay(state.overlayVisible || state.settings.alwaysShowOverlay);
   if (mainWindow) registerHotkeys(state.hotkeys, mainWindow, broadcastState);
   prepareAutoUpdater();
+  if (state.settings.onlineUpdatesEnabled && state.settings.autoCheckUpdates) {
+    setTimeout(() => checkForUpdatesNow().then(rebuildTray).catch(() => rebuildTray()), 4000);
+  }
   await startGameDetection();
 });
 

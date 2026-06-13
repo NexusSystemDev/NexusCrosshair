@@ -5,7 +5,8 @@ import { getSettings } from './storage';
 
 let lastStatus: UpdaterStatus = {
   status: 'idle',
-  detail: 'Updater is ready. Configure a release feed before checking online.'
+  detail: 'Updater is ready. Configure a release feed before checking online.',
+  version: app.getVersion()
 };
 
 const releaseFeed = {
@@ -13,6 +14,8 @@ const releaseFeed = {
   owner: 'NexusSystemDev',
   repo: 'NexusCrosshair'
 };
+
+export const releaseFeedUrl = `https://github.com/${releaseFeed.owner}/${releaseFeed.repo}/releases`;
 
 const updatesEnabled = () => getSettings().onlineUpdatesEnabled;
 
@@ -50,9 +53,14 @@ autoUpdater.on('update-downloaded', (info) => {
   };
 });
 
+export function getLastUpdateStatus() {
+  return lastStatus;
+}
+
 export function prepareAutoUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
+  (autoUpdater as any).verifyUpdateCodeSignature = async () => null;
   configureFeed();
 }
 
@@ -102,7 +110,8 @@ export async function checkForUpdatesNow(): Promise<UpdaterStatus> {
       status: 'current',
       detail: 'Online update checks are disabled until GitHub Releases or a generic update server is configured.',
       channel: getSettings().updateChannel,
-      version: app.getVersion()
+      version: app.getVersion(),
+      releaseNotes: releaseFeedUrl
     };
     return lastStatus;
   }
@@ -110,14 +119,14 @@ export async function checkForUpdatesNow(): Promise<UpdaterStatus> {
   try {
     configureFeed();
     const channel = getSettings().updateChannel;
-    autoUpdater.channel = channel;
+    autoUpdater.channel = channel === 'stable' ? 'latest' : channel;
     lastStatus = { status: 'checking', detail: `Checking ${channel} channel...`, channel };
     const result = await autoUpdater.checkForUpdates();
     const version = result?.updateInfo?.version;
     const notes = typeof result?.updateInfo?.releaseNotes === 'string' ? result.updateInfo.releaseNotes : undefined;
     lastStatus = version && version !== app.getVersion()
-      ? { status: 'available', detail: `Version ${version} is available.`, version, channel, releaseNotes: notes }
-      : { status: 'current', detail: `Nexus Crosshair Pro ${app.getVersion()} is up to date.`, version: app.getVersion(), channel };
+      ? { status: 'available', detail: `Version ${version} is available.`, version, channel, releaseNotes: notes || releaseFeedUrl }
+      : { status: 'current', detail: `Nexus Crosshair Pro ${app.getVersion()} is up to date.`, version: app.getVersion(), channel, releaseNotes: notes || releaseFeedUrl };
     return lastStatus;
   } catch (error) {
     lastStatus = {

@@ -19,6 +19,7 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
   const [checking, setChecking] = useState(false);
   useEffect(() => {
     window.nexusAPI.getDisplays().then(setDisplays);
+    window.nexusAPI.getUpdateStatus().then(setUpdater);
   }, []);
   const setting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => saveSettings({ ...settings, [key]: value });
   const hotkey = <K extends keyof Hotkeys>(key: K, value: Hotkeys[K]) => saveHotkeys({ ...hotkeys, [key]: value });
@@ -155,11 +156,11 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
             <BadgeInfo className="h-5 w-5 text-violet-300" />
             <div>
               <h2 className="text-xl font-black">What's New</h2>
-              <p className="text-sm text-zinc-400">Version 0.0.0 release polish.</p>
+              <p className="text-sm text-zinc-400">Version 0.0.2 update polish.</p>
             </div>
           </div>
           <div className="grid gap-3 text-sm text-zinc-300">
-            {['Epic command-center redesign', 'Smart Coach and Training Arena', 'OBS browser-source export', 'Premium Splash, Icon and Installer assets'].map((item) => (
+            {['In-app release notes', 'Auto update checks on app start', 'Tray update actions', 'Pinned GitHub updater feed'].map((item) => (
               <div key={item} className="rounded-2xl border border-white/[0.08] bg-[#171722] px-4 py-3">{item}</div>
             ))}
           </div>
@@ -217,6 +218,10 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
               Online Update Checks
               <input type="checkbox" checked={settings.onlineUpdatesEnabled} onChange={(event) => setting('onlineUpdatesEnabled', event.target.checked)} />
             </label>
+            <label className="flex items-center justify-between rounded-3xl border border-white/[0.08] bg-[#171722] p-4 font-semibold">
+              Auto Check on Start
+              <input type="checkbox" checked={settings.autoCheckUpdates} onChange={(event) => setting('autoCheckUpdates', event.target.checked)} />
+            </label>
             <div className="rounded-3xl border border-white/[0.08] bg-[#171722] p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-violet-300">{updater?.status ?? 'idle'}</p>
@@ -229,7 +234,12 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
                   <div className="h-full rounded-full bg-violet-500 shadow-[0_0_18px_rgba(139,92,246,.55)]" style={{ width: `${updater.percent}%` }} />
                 </div>
               )}
-              {updater?.releaseNotes && <p className="mt-3 max-h-28 overflow-auto whitespace-pre-wrap text-xs text-zinc-400">{updater.releaseNotes}</p>}
+              {updater?.releaseNotes && (
+                <div className="mt-3 rounded-2xl border border-white/[0.08] bg-[#07070A]/60 p-3">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-violet-300">Release Notes</p>
+                  <p className="max-h-28 overflow-auto whitespace-pre-wrap text-xs text-zinc-400">{updater.releaseNotes}</p>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-3 gap-2">
               <button className="nexus-button nexus-button-primary px-3" disabled={checking} onClick={async () => {
@@ -242,6 +252,7 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
               <button className="nexus-button px-3" disabled={updater?.status !== 'available'} onClick={async () => setUpdater(await window.nexusAPI.downloadUpdate())}>Download</button>
               <button className="nexus-button px-3" disabled={updater?.status !== 'downloaded'} onClick={async () => setUpdater(await window.nexusAPI.installUpdate())}>Install</button>
             </div>
+            <button className="nexus-button" onClick={() => window.nexusAPI.getUpdateStatus().then(setUpdater)}>Refresh Status</button>
           </div>
         </section>
       </aside>

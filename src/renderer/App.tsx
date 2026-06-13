@@ -106,8 +106,10 @@ export default function App() {
   const [stats, setStats] = useState<SystemStats>({ overlayFps: 0, ramMb: 0, cpuPercent: 0, runtimeSeconds: 0 });
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [page, setPage] = useState<(typeof pages)[number]['id']>('dashboard');
+  const [notifiedUpdate, setNotifiedUpdate] = useState('');
   const activeProfile = useMemo(() => state?.profiles.find((profile) => profile.id === state.activeProfileId) ?? state?.profiles[0], [state]);
   const [draft, setDraft] = useState<CrosshairSettings | null>(null);
+  const [appVersion, setAppVersion] = useState<string>('0.0.0');
 
   const notify = (title: string, detail?: string, tone: ToastItem['tone'] = 'info') => {
     const id = crypto.randomUUID();
@@ -117,6 +119,7 @@ export default function App() {
 
   useEffect(() => {
     if (isOverlay) return;
+    window.nexusAPI.getDiagnostics().then((info) => setAppVersion(info.appVersion));
     window.nexusAPI.getState().then((next) => {
       setState(next);
       const active = next.profiles.find((profile) => profile.id === next.activeProfileId) ?? next.profiles[0];
@@ -138,6 +141,20 @@ export default function App() {
   useEffect(() => {
     if (draft && page === 'editor') window.nexusAPI.updateCrosshair(draft);
   }, [draft, page]);
+
+  useEffect(() => {
+    if (isOverlay || !state?.settings.onlineUpdatesEnabled) return;
+    const check = async () => {
+      const status = await window.nexusAPI.getUpdateStatus();
+      if (status.status === 'available' && status.version && status.version !== notifiedUpdate) {
+        setNotifiedUpdate(status.version);
+        notify('Update available', `Version ${status.version}`, 'success');
+      }
+    };
+    check();
+    const timer = setInterval(check, 15000);
+    return () => clearInterval(timer);
+  }, [state?.settings.onlineUpdatesEnabled, notifiedUpdate]);
 
   if (isOverlay) return <OverlayApp />;
   if (!state || !activeProfile || !draft) return <div className="flex h-full items-center justify-center bg-[#07070A] text-white">Nexus Crosshair Pro</div>;
@@ -236,7 +253,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-black tracking-wide">Nexus Crosshair Pro</h1>
-            <p className="text-xs font-medium text-zinc-400">Version 0.0.2 / Stable</p>
+            <p className="text-xs font-medium text-zinc-400">Version {appVersion} / {state.settings.updateChannel === 'beta' ? 'Beta' : 'Stable'}</p>
           </div>
         </div>
 

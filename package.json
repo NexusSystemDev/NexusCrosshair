@@ -1,8 +1,8 @@
 {
   "name": "nexus-crosshair-pro",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Click-through crosshair overlay for Windows.",
-  "author": "NexusTools",
+  "author": "NexusSystemDev",
   "main": "app-dist/main/main.js",
   "type": "commonjs",
   "scripts": {
@@ -37,8 +37,8 @@
   },
   "build": {
     "productName": "Nexus Crosshair Pro",
-    "appId": "com.nexustools.crosshairpro",
-    "copyright": "Copyright © 2026 NexusTools",
+    "appId": "com.NexusSystemDev.crosshairpro",
+    "copyright": "Copyright © 2026 NexusSystemDev",
     "directories": {
       "output": "dist",
       "buildResources": "buildResources"
@@ -58,7 +58,7 @@
       }
     ],
     "extraMetadata": {
-      "version": "0.0.1"
+      "version": "0.0.5"
     },
     "win": {
       "target": [
@@ -67,9 +67,7 @@
       ],
       "icon": "buildResources/icon.ico",
       "artifactName": "${productName} ${version} ${arch}.${ext}",
-      "signtoolOptions": {
-        "publisherName": "NexusTools"
-      }
+      "verifyUpdateCodeSignature": false
     },
     "nsis": {
       "oneClick": false,
