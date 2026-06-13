@@ -10,6 +10,7 @@ import {
   MonitorCog,
   Power,
   RadioTower,
+  Rocket,
   Settings as SettingsIcon,
   SlidersHorizontal,
   Trophy,
@@ -25,6 +26,7 @@ import { Diagnostics } from './pages/Diagnostics';
 import { Editor } from './pages/Editor';
 import { Coach } from './pages/Coach';
 import { Profiles } from './pages/Profiles';
+import { Release } from './pages/Release';
 import { Settings } from './pages/Settings';
 import { Training } from './pages/Training';
 import type { CrosshairPreset } from './data/presets';
@@ -40,6 +42,7 @@ const pages = [
   { id: 'profiles', label: 'Profiles', icon: UserRoundCog },
   { id: 'library', label: 'Library', icon: Library },
   { id: 'diagnostics', label: 'Diagnostics', icon: MonitorCog },
+  { id: 'release', label: 'Release', icon: Rocket },
   { id: 'settings', label: 'Settings', icon: SettingsIcon }
 ] as const;
 
@@ -322,6 +325,7 @@ export default function App() {
                 {page === 'profiles' && <Profiles profiles={state.profiles} activeProfileId={state.activeProfileId} activate={activate} save={persistProfile} remove={remove} duplicate={duplicate} exportProfile={async (id) => { const path = await window.nexusAPI.exportProfile(id); notify(path ? 'Profile exported' : 'Export cancelled', path ?? undefined, path ? 'success' : 'info'); }} importProfile={async () => { const profile = await window.nexusAPI.importProfile(); setState(await window.nexusAPI.getState()); notify(profile ? 'Profile imported' : 'Import cancelled', profile?.name, profile ? 'success' : 'info'); }} />}
                 {page === 'library' && <Community profiles={state.profiles} activeProfile={activeProfile} saveProfile={persistProfile} activate={activate} duplicate={duplicate} applyPreset={applyPreset} exportProfile={async (id) => { const path = await window.nexusAPI.exportProfile(id); notify(path ? 'Crosshair exported' : 'Export cancelled', path ?? undefined, path ? 'success' : 'info'); }} importProfile={async () => { const profile = await window.nexusAPI.importProfile(); setState(await window.nexusAPI.getState()); notify(profile ? 'Crosshair imported' : 'Import cancelled', profile?.name, profile ? 'success' : 'info'); }} />}
                 {page === 'diagnostics' && <Diagnostics notify={notify} />}
+                {page === 'release' && <Release settings={state.settings} />}
                 {page === 'settings' && <Settings settings={state.settings} hotkeys={state.hotkeys} saveSettings={saveSettings} saveHotkeys={saveHotkeys} backup={async () => { const path = await window.nexusAPI.backupData(); notify(path ? 'Backup exported' : 'Backup cancelled', path ?? undefined, path ? 'success' : 'info'); }} importBackup={async () => { const next = await window.nexusAPI.importBackup(); if (next) { setState(next); const active = next.profiles.find((profile) => profile.id === next.activeProfileId) ?? next.profiles[0]; setDraft(active.crosshair); notify('Backup imported', undefined, 'success'); } else notify('Import cancelled'); }} reset={async () => { const next = await window.nexusAPI.resetData(); setState(next); setDraft(next.profiles[0].crosshair); notify('Data reset', undefined, 'danger'); }} />}
               </motion.div>
             </AnimatePresence>

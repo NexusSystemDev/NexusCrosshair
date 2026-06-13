@@ -156,11 +156,11 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
             <BadgeInfo className="h-5 w-5 text-violet-300" />
             <div>
               <h2 className="text-xl font-black">What's New</h2>
-              <p className="text-sm text-zinc-400">Version 0.0.2 update polish.</p>
+              <p className="text-sm text-zinc-400">Version 0.0.4 release polish.</p>
             </div>
           </div>
           <div className="grid gap-3 text-sm text-zinc-300">
-            {['In-app release notes', 'Auto update checks on app start', 'Tray update actions', 'Pinned GitHub updater feed'].map((item) => (
+            {['Release dashboard', 'Pixel perfect safety checks', 'Safer destructive actions', 'Pinned GitHub updater feed'].map((item) => (
               <div key={item} className="rounded-2xl border border-white/[0.08] bg-[#171722] px-4 py-3">{item}</div>
             ))}
           </div>
@@ -195,7 +195,7 @@ export function Settings({ settings, hotkeys, saveSettings, saveHotkeys, backup,
             <button className="nexus-button nexus-button-primary" onClick={backup}><Save className="h-4 w-4" />Export Backup</button>
             <button className="nexus-button" onClick={importBackup}><Upload className="h-4 w-4" />Import Backup</button>
             <button className="nexus-button" onClick={() => window.nexusAPI.openDataFolder()}><FolderOpen className="h-4 w-4" />Open Data Folder</button>
-            <button className="nexus-button text-red-200" onClick={reset}><RotateCcw className="h-4 w-4" />Reset Data</button>
+            <button className="nexus-button text-red-200" onClick={() => window.confirm('Reset all Nexus Crosshair Pro data?') && reset()}><RotateCcw className="h-4 w-4" />Reset Data</button>
           </div>
         </section>
 

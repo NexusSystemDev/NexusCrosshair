@@ -1,6 +1,6 @@
 {
   "name": "nexus-crosshair-pro",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Click-through crosshair overlay for Windows.",
   "author": "NexusSystemDev",
   "main": "app-dist/main/main.js",
@@ -58,7 +58,7 @@
       }
     ],
     "extraMetadata": {
-      "version": "0.0.5"
+      "version": "0.0.4"
     },
     "win": {
       "target": [

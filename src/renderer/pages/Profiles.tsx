@@ -44,6 +44,13 @@ export function Profiles({ profiles, activeProfileId, activate, save, remove, du
         </label>
       </div>
 
+      {visible.length === 0 && (
+        <div className="glass-card-soft rounded-3xl p-8 text-center">
+          <p className="text-lg font-black">No profiles found</p>
+          <p className="mt-2 text-sm text-zinc-400">Create a new profile or clear the search filter.</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-5">
         {visible.map((profile) => (
           <article key={profile.id} className="glass-card-soft rounded-3xl p-5">
@@ -75,7 +82,7 @@ export function Profiles({ profiles, activeProfileId, activate, save, remove, du
                   <button className="nexus-button px-3" onClick={() => duplicate(profile)}><Copy className="h-4 w-4" /></button>
                   <button className="nexus-button px-3" onClick={() => exportProfile(profile.id)}><Download className="h-4 w-4" /></button>
                   <button className="nexus-button px-3" onClick={() => save(profile)}>Edit</button>
-                  <button className="nexus-button px-3 text-red-200" onClick={() => remove(profile.id)} disabled={profiles.length < 2}><Trash2 className="h-4 w-4" /></button>
+                  <button className="nexus-button px-3 text-red-200" onClick={() => window.confirm(`Delete profile "${profile.name}"?`) && remove(profile.id)} disabled={profiles.length < 2}><Trash2 className="h-4 w-4" /></button>
                 </div>
               </div>
             </div>

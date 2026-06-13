@@ -39,6 +39,25 @@ export function Editor({ profile, profiles, draft, setDraft, save, reset, activa
     localStorage.setItem('nexus-crosshair-code-history', JSON.stringify(next));
   };
   const patch = <K extends keyof CrosshairSettings>(key: K, value: CrosshairSettings[K]) => setDraft({ ...draft, [key]: value });
+  const safetyIssues = [
+    draft.size % 2 !== 0 && 'Size should be even for a sharper SVG center.',
+    draft.thickness % 1 !== 0 && 'Thickness should be a full pixel.',
+    draft.gap % 1 !== 0 && 'Gap should be a full pixel.',
+    draft.dotSize % 1 !== 0 && 'Dot size should be a full pixel.',
+    draft.opacity < 0.75 && 'Low opacity can disappear on bright maps.',
+    draft.glow && draft.glowStrength > 10 && 'Strong glow can visually soften edges.'
+  ].filter(Boolean) as string[];
+  const fixPixelPerfect = () => setDraft({
+    ...draft,
+    size: Math.max(20, Math.round(draft.size / 2) * 2),
+    length: Math.max(4, Math.round(draft.length)),
+    thickness: Math.max(1, Math.round(draft.thickness)),
+    gap: Math.max(0, Math.round(draft.gap)),
+    dotSize: Math.max(1, Math.round(draft.dotSize)),
+    circleRadius: Math.max(4, Math.round(draft.circleRadius)),
+    glowStrength: Math.min(Math.round(draft.glowStrength), 10),
+    opacity: Math.max(draft.opacity, 0.85)
+  });
   const adaptiveMode = (mode: 'fight' | 'sniper' | 'shotgun' | 'edit') => {
     const modes = {
       fight: { type: 'cross' as const, gap: 6, length: 20, thickness: 3, dotSize: 3, circleRadius: 18, glowStrength: 6 },
@@ -135,6 +154,23 @@ export function Editor({ profile, profiles, draft, setDraft, save, reset, activa
                   {profiles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select>
               </label>
+              <div className="grid gap-3 rounded-3xl border border-white/[0.08] bg-[#07070A]/70 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 className="font-black">Pixel Perfect Safety</h4>
+                    <p className="text-sm text-zinc-400">Keeps the SVG crosshair sharp and readable.</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-bold ${safetyIssues.length ? 'bg-amber-500/15 text-amber-200' : 'bg-emerald-500/15 text-emerald-300'}`}>
+                    {safetyIssues.length ? `${safetyIssues.length} issues` : 'Clean'}
+                  </span>
+                </div>
+                {safetyIssues.length > 0 && (
+                  <div className="grid gap-2 text-sm text-zinc-300">
+                    {safetyIssues.map((issue) => <div key={issue} className="rounded-2xl border border-white/[0.08] bg-[#171722] px-3 py-2">{issue}</div>)}
+                  </div>
+                )}
+                <button className="nexus-button nexus-button-primary" onClick={fixPixelPerfect}>Fix Pixel Perfect</button>
+              </div>
               <div className="grid gap-3 rounded-3xl border border-white/[0.08] bg-[#07070A]/70 p-4">
                 <div>
                   <h4 className="font-black">Adaptive Modes</h4>
